@@ -1,0 +1,9 @@
+containers: {
+  web: {
+    build: {
+      context: "."
+      target: "builder"
+    }
+    ports: publish: "8000/http"
+  }
+}
