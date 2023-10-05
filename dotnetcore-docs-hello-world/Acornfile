@@ -1,0 +1,9 @@
+containers: {
+  web: {
+    build: {
+      context: "."
+      dockerfile: "./Dockerfile.linux"
+    }
+    ports: publish: "80/http"
+  }
+}
