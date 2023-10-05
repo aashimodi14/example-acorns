@@ -1,7 +1,7 @@
 containers: {
   web: {
     build: {
-      context: "."
+      context: "app"
       target: "builder"
     }
     ports: publish: "8000/http"
