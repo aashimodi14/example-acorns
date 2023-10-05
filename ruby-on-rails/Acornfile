@@ -1,0 +1,25 @@
+containers: {
+  db: {
+    image: "postgres"
+    env: {
+      "POSTGRES_PASSWORD": "secret://db-password/token?mode=0400"
+    }
+    dirs: "/var/lib/postgresql/data": "volume://db-data"
+    ports: [ 5432 ]
+  }
+  web: {
+    build: context: "myapp"
+    cmd: [ "/bin/bash", "-c", "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0" ]
+    dirs: "/myapp": "./"
+    ports: publish: "3000/http"
+    dependsOn: [ "db" ]
+  }
+}
+
+volumes: {
+  "db-data": {}
+}
+
+secrets: {
+  "db-password": type: "token"
+}
