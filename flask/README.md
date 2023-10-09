@@ -42,33 +42,81 @@ containers: {
 
 ## Deploy with Acorn
 
-```
-$ docker compose up -d
-[+] Building 1.1s (16/16) FINISHED
- => [internal] load build definition from Dockerfile                                                                                                                                                                                       0.0s
-    ...                                                                                                                                         0.0s
- => => naming to docker.io/library/flask_web                                                                                                                                                                                               0.0s
-[+] Running 2/2
- ⠿ Network flask_default  Created                                                                                                                                                                                                          0.0s
- ⠿ Container flask-web-1  Started
+To deploy this project, go to 
+
+```bash
+  acorn run
 ```
 
-## Expected result
+## Explaining the Acornfile
 
-Listing containers must show one container running and the port mapping as below:
-```
-$ docker compose ps
-NAME                COMMAND             SERVICE             STATUS              PORTS
-flask-web-1         "python3 app.py"    web                 running             0.0.0.0:8000->8000/tcp
+* `args` section: describes a set of arguments that can be passed in by the user of this Acorn image
+
+A help text will be auto-generated using the comment just above the arg:
+
+
+```bash
+$ acorn run . --help
+
+Volumes:   <none>
+Secrets:   <none>
+Containers: web
+Ports:     web:8000/http
+
+      --welcome-text string   Configure your personal welcome text
 ```
 
-After the application starts, navigate to `http://localhost:8000` in your web browser or run:
-```
-$ curl localhost:8000
-Hello World!
+* `containers` section: describes the set of containers your Acorn app consists of
+
+  * Note: app, db and cache are custom names of your containers
+  * `app` - Our Python Flask App
+    * `build`: build from Dockerfile that we created
+    * `env`: environment variables, statically defined, referencing a secret or referencing an Acorn argument
+    * `ports`: using the publish type, we expose the app inside the cluster but also outside of it using an auto-generated ingress resource
+    * `dirs`: Directories to mount into the container filesystem
+      * `dirs: "/app": "./"`: Mount the current directory to the /app dir, which is where the code resides inside the container as per the Dockerfile. This is to enable hot-reloading of code.
+
+## Run your Application
+
+To start your Acorn app just run:
+
+```bash
+acorn run -n flask-app . 
 ```
 
-Stop and remove the containers
+or customize the welcome text argument via:
+
+```bash
+acorn run -n flask-app . --welcome "Let's Get Started"
 ```
-$ docker compose down
+
+The `-n flask-app` gives this app a specific name so that the rest of the steps can refer to it. If you omit `-n`, a random two-word name will be generated.
+
+## Access your app
+
+Due to the configuration `ports: publish: "8000/http"` under `containers.app`, our web app will be exposed outside of our Kubernetes cluster using the cluster's ingress controller. Checkout the running apps via
+
+```bash
+acorn apps
 ```
+
+```bash
+$ acorn apps
+NAME        IMAGE          COMMIT         CREATED     ENDPOINTS                                          MESSAGE
+flask-app   0ed9a2b95c69   114c50666ed9   3m22s ago   http://web-flask-app-98d916c5.local.oss-acorn.io   OK
+
+```
+
+## Development Mode
+
+In development mode, Acorn will watch the local directory for changes and synchronize them to the running Acorn app. In general, changes to the Acornfile are directly synchronized, e.g. adding environment variables, etc. Depending on the change, the deployed containers will be recreated.
+
+```bash
+acorn dev -n flask-app
+```
+
+The lines `if args.dev { dirs: "/app": "./" }` enable hot-reloading of code by mounting the current local directory into the app container.
+
+You will see the change applied when you reload the application's page in your browser.
+
+
