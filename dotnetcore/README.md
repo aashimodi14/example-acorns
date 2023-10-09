@@ -61,3 +61,7 @@ In development mode, Acorn will watch the local directory for changes and synchr
 acorn dev -n web-app
 ```
 
+## Sample Output
+
+![image](https://github.com/aashimodi14/example-acorns/assets/19594982/df11306c-f540-4742-a4bf-59b50a231a13)
+
