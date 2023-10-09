@@ -1,36 +1,46 @@
-## Compose sample application
-
-### Use with Docker Development Environments
-
-You can open this sample in the Dev Environments feature of Docker Desktop version 4.12 or later.
-
-[Open in Docker Dev Environments <img src="../open_in_new.svg" alt="Open in Docker Dev Environments" align="top"/>](https://open.docker.com/dashboard/dev-envs?url=https://github.com/docker/awesome-compose/tree/master/flask)
+## Flask sample application
 
 ### Python/Flask application
 
 Project structure:
 ```
 .
-├── compose.yaml
+├── Acornfile
 ├── app
-    ├── Dockerfile
-    ├── requirements.txt
-    └── app.py
+│   ├── app.py
+│   ├── Dockerfile
+│   └── requirements.txt
+├── compose.yaml
+└── README.md
 
 ```
 
-[_compose.yaml_](compose.yaml)
+[_Acornfile_](.Acornfile)
 ```
-services: 
-  web: 
-    build:
-     context: app
-     target: builder
-    ports: 
-      - '8000:8000'
+args: {
+  // Configure your personal welcome text
+  welcome: "Acorn User!!"
+}
+containers: {
+  web: {
+    build: {
+      context: "app"
+      target: "builder"
+    }
+   env: {
+      "WELCOME": args.welcome
+      if args.dev { 
+        "FLASK_ENV": "development"
+        "FLASK_DEBUG" : "1"
+         }
+    }
+    if args.dev { dirs: "/app": "./" }
+    ports: publish: "8000/http"
+  }
+}
 ```
 
-## Deploy with docker compose
+## Deploy with Acorn
 
 ```
 $ docker compose up -d

@@ -1,9 +1,20 @@
+args: {
+  // Configure your personal welcome text
+  welcome_text: "Acorn User!!"
+}
 containers: {
   web: {
     build: {
       context: "app"
       target: "builder"
     }
+   env: {
+      "WELCOME": args.welcome_text
+      if args.dev { 
+        "FLASK_DEBUG": "1"
+      }
+    }
+    if args.dev { dirs: "/app": "./app" }
     ports: publish: "8000/http"
   }
 }
