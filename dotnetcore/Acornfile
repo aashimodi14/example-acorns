@@ -4,6 +4,11 @@ containers: {
       context: "."
       dockerfile: "./Dockerfile.linux"
     }
+   env: {
+      if args.dev { 
+        "ASPNETCORE_ENVIRONMENT": "development"
+      }
+   }
     ports: publish: "80/http"
   }
 }

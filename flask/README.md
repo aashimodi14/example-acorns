@@ -1,6 +1,6 @@
-## Flask sample application
+# Flask sample application
 
-### Python/Flask application
+## Python/Flask application
 
 Project structure:
 ```
